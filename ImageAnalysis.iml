@@ -10,20 +10,6 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ImageLibraries/opencv/opencv/build/java/opencv-401.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <NATIVE>
-          <root url="file://$MODULE_DIR$/../ImageLibraries/opencv/opencv/build/java/x64" />
-        </NATIVE>
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/../ImageLibraries/opencv/opencv/build/java/opencv-401.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/../ImageLibraries/jfreechart-1.0.19/jfreechart-1.0.19/lib/jcommon-1.0.23.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -37,6 +23,20 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ImageLibraries/opencv/opencv/build/java/opencv-401.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <NATIVE>
+          <root url="file://$MODULE_DIR$/../ImageLibraries/opencv/opencv/build/java/x64" />
+        </NATIVE>
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/../ImageLibraries/opencv/opencv/build/java/opencv-401.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>
