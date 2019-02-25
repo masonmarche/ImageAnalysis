@@ -2,5 +2,8 @@ import org.opencv.core.Mat;
 
 public class Main {
 
-    private Mat mat = new Mat();
+    public static void main(String [] args) {
+        InstagramCollector c = new InstagramCollector("pantone");
+        System.out.println(c.getHTML());
+    }
 }
