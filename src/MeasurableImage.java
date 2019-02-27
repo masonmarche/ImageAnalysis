@@ -5,15 +5,15 @@ import java.util.*;
 
 public class MeasurableImage {
 
-    static{ System.loadLibrary(Core.NATIVE_LIBRARY_NAME); }
+    static{ System.loadLibrary( Core.NATIVE_LIBRARY_NAME ) ; }
 
-    private Mat mat;
-    private Size size;
+    private Mat mat ;
+    private Size size ;
 
     public MeasurableImage() {
         mat = Imgcodecs.imread("src/test.png" ) ;
         size  = mat.size() ;
-        System.out.println( getHue( getModeHue() ) ) ;
+        System.out.println( getAvgHue() ) ;
     }
 
     public static void main ( String[] args ) {
@@ -21,7 +21,7 @@ public class MeasurableImage {
         new MeasurableImage() ;
     }
 
-    public double[] getAvgColor() {
+    public double[] getAvgRGBColor() {
         double[] color = {0,0,0} ;
         for ( int i = 0 ; i < size.height ; i++ ) {
             for ( int j = 0 ; j < size.width ; j++ ) {
@@ -37,23 +37,60 @@ public class MeasurableImage {
         return color ;
     }
 
-    public int getModeHue() {
-        HashMap<Integer, Integer> colorMap = new HashMap<Integer, Integer>() ;
+    public double getAvgHue() {
+        return getAvgHSV( 0 ) ;
+    }
+
+    public double getAvgSat() {
+        return getAvgHSV( 1 ) ;
+    }
+
+    public double getAvgVal() {
+        return getAvgHSV( 2 ) ;
+    }
+
+    private double getAvgHSV( int location  ) {
+        Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
+        Imgproc.cvtColor( mat, temp, Imgproc.COLOR_RGB2HSV ) ;
+        double sum = 0 ;
+        for ( int i = 0 ; i < size.height ; i++ ) {
+            for ( int j = 0 ; j < size.width ; j++ ) {
+                double[] data = temp.get( i, j ) ;
+                sum += data[location] ;
+            }
+        }
+        return sum / ( size.height * size.width ) ;
+    }
+
+    public double getModeHue() {
+        return getModeHSV( 0 ) ;
+    }
+
+    public double getModeSat() {
+        return getModeHSV( 1 ) ;
+    }
+
+    public double getModeVal() {
+        return getModeHSV( 2 ) ;
+    }
+
+    private double getModeHSV( int location ) {
+        HashMap<Double, Integer> colorMap = new HashMap<Double, Integer>() ;
         Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
         Imgproc.cvtColor( mat, temp, Imgproc.COLOR_RGB2HSV ) ;
         for ( int i = 0; i < size.height; i++ ) {
             for ( int j = 0; j < size.width; j++ ) {
                 double[] hsv = temp.get( i, j ) ;
-                if ( colorMap.keySet().contains( ( int ) hsv[0] ) ) {
-                    colorMap.replace( ( int ) hsv[0], colorMap.get( ( int ) hsv[0] ) + 1 ) ;
+                if ( colorMap.keySet().contains( hsv[location] ) ) {
+                    colorMap.replace( hsv[location], colorMap.get( hsv[location] ) + 1 ) ;
                 } else {
-                    colorMap.put( ( int ) hsv[0], 1 ) ;
+                    colorMap.put( hsv[location], 1 ) ;
                 }
             }
         }
-        int mode = -1 ;
+        double mode = -1 ;
         int max = -1 ;
-        for( int k : colorMap.keySet() ) {
+        for( double k : colorMap.keySet() ) {
             if( colorMap.get( k ) > max ) {
                 mode = k ;
                 max = colorMap.get( k ) ;
@@ -62,26 +99,28 @@ public class MeasurableImage {
         return  mode ;
     }
 
-    public String getHue( int hue ) {
-        String color = "" ;
-        System.out.println( hue ) ;
-        switch ( ( ( int ) ( hue + 15 * 2 ) / 30 ) * 30 ) {
-            case 0: color = "red" ; break ;
-            case 30: color = "orange" ; break ;
-            case 60: color = "yellow" ; break ;
-            case 90: color = "green-yellow" ; break ;
-            case 120: color = "green" ; break ;
-            case 150: color = "cyan-green" ; break ;
-            case 180: color = "cyan" ; break ;
-            case 210: color = "blue-cyan" ; break ;
-            case 240: color = "blue" ; break ;
-            case 270: color = "magenta-blue" ; break ;
-            case 300: color = "magenta" ; break ;
-            case 330: color = "red-magenta" ; break ;
-            default: color = "red" ; break ;
+    public double stdDevHue() {
+        return stdDevHSV( 0 ) ;
+    }
 
+    public double stdDevSat() {
+        return stdDevHSV( 1 ) ;
+    }
+
+    public double stdDevVal() {
+        return stdDevHSV( 2 ) ;
+    }
+
+    private double stdDevHSV( int location ) {
+        Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
+        Imgproc.cvtColor( mat, temp, Imgproc.COLOR_RGB2HSV ) ;
+        double sum = 0 ;
+        double avg = getModeHSV( location ) ;
+        for ( int i = 0; i < size.height; i++ ) {
+            for ( int j = 0; j < size.width; j++ ) {
+               sum += Math.pow( avg - temp.get( i, j )[location], 2 ) ;
+            }
         }
-        System.out.println( ( ( int ) ( hue + 15 * 2 ) / 30 ) * 30  ) ;
-        return color ;
+        return Math.sqrt( sum / ( size.height * size.width ) ) ;
     }
 }

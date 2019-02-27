@@ -25,10 +25,29 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/MeasurableImage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="515">
-              <caret line="85" column="5" lean-forward="true" selection-start-line="85" selection-start-column="5" selection-end-line="85" selection-end-column="5" />
+            <state relative-caret-position="476">
+              <caret line="58" column="39" selection-start-line="58" selection-start-column="39" selection-end-line="58" selection-end-column="39" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#1050#1051#0" expanded="true" />
+                <element signature="e#1088#1089#0" expanded="true" />
+                <element signature="e#1121#1122#0" expanded="true" />
+                <element signature="e#1159#1160#0" expanded="true" />
+                <element signature="e#1192#1193#0" expanded="true" />
+                <element signature="e#1230#1231#0" expanded="true" />
+                <element signature="e#1087#1088#0" expanded="true" />
+                <element signature="e#1119#1120#0" expanded="true" />
+                <element signature="e#1158#1159#0" expanded="true" />
+                <element signature="e#1197#1198#0" expanded="true" />
+                <element signature="e#1229#1230#0" expanded="true" />
+                <element signature="e#1268#1269#0" expanded="true" />
+                <element signature="e#1331#1348#0" expanded="true" />
+                <element signature="e#2856#2857#0" expanded="true" />
+                <element signature="e#2894#2895#0" expanded="true" />
+                <element signature="e#2931#2932#0" expanded="true" />
+                <element signature="e#2969#2970#0" expanded="true" />
+                <element signature="e#3002#3003#0" expanded="true" />
+                <element signature="e#3040#3041#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -145,7 +164,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13272922" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -156,7 +174,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.22751896" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.22751896" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -208,10 +226,29 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/MeasurableImage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="515">
-          <caret line="85" column="5" lean-forward="true" selection-start-line="85" selection-start-column="5" selection-end-line="85" selection-end-column="5" />
+        <state relative-caret-position="476">
+          <caret line="58" column="39" selection-start-line="58" selection-start-column="39" selection-end-line="58" selection-end-column="39" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#1050#1051#0" expanded="true" />
+            <element signature="e#1088#1089#0" expanded="true" />
+            <element signature="e#1121#1122#0" expanded="true" />
+            <element signature="e#1159#1160#0" expanded="true" />
+            <element signature="e#1192#1193#0" expanded="true" />
+            <element signature="e#1230#1231#0" expanded="true" />
+            <element signature="e#1087#1088#0" expanded="true" />
+            <element signature="e#1119#1120#0" expanded="true" />
+            <element signature="e#1158#1159#0" expanded="true" />
+            <element signature="e#1197#1198#0" expanded="true" />
+            <element signature="e#1229#1230#0" expanded="true" />
+            <element signature="e#1268#1269#0" expanded="true" />
+            <element signature="e#1331#1348#0" expanded="true" />
+            <element signature="e#2856#2857#0" expanded="true" />
+            <element signature="e#2894#2895#0" expanded="true" />
+            <element signature="e#2931#2932#0" expanded="true" />
+            <element signature="e#2969#2970#0" expanded="true" />
+            <element signature="e#3002#3003#0" expanded="true" />
+            <element signature="e#3040#3041#0" expanded="true" />
           </folding>
         </state>
       </provider>
