@@ -1,7 +1,8 @@
 import org.opencv.core.*;
-import org.opencv.imgproc.Imgproc;
 import org.opencv.imgcodecs.Imgcodecs;
-import java.util.*;
+import org.opencv.imgproc.Imgproc;
+
+import java.util.HashMap;
 
 public class MeasurableImage {
 
@@ -11,14 +12,16 @@ public class MeasurableImage {
     private Size size;
 
     public MeasurableImage() {
-        mat = Imgcodecs.imread("src/test.png" ) ;
+        mat = Imgcodecs.imread("src/notBlurry.jpg" ) ;
         size  = mat.size() ;
         System.out.println( getHue( getModeHue() ) ) ;
     }
 
     public static void main ( String[] args ) {
 
-        new MeasurableImage() ;
+        MeasurableImage im = new MeasurableImage() ;
+
+        System.out.println("BLUR: " + im.getBlur(im.mat));
     }
 
     public double[] getAvgColor() {
@@ -83,5 +86,25 @@ public class MeasurableImage {
         }
         System.out.println( ( ( int ) ( hue + 15 * 2 ) / 30 ) * 30  ) ;
         return color ;
+    }
+
+    public double getBlur(Mat mat) {
+
+        Mat destination = new Mat();
+        Mat matGray = new Mat();
+
+        MatOfDouble median = new MatOfDouble();
+        MatOfDouble std = new MatOfDouble();
+
+        // Convert image to greyscale
+        Imgproc.cvtColor(mat, matGray, Imgproc.COLOR_BGR2GRAY);
+
+        //
+        Imgproc.Laplacian(matGray, destination, 3);
+
+        // Calc std deviation for image
+        Core.meanStdDev(destination, median, std);
+
+        return Math.pow(std.get(0,0)[0], 2);
     }
 }

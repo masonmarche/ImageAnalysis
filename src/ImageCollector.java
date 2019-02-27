@@ -12,7 +12,6 @@ public abstract class ImageCollector {
 
     public abstract List<Mat> getImages();
 
-
     BufferedImage downloadImage(String urlString) {
         BufferedImage img = null;
         try {
