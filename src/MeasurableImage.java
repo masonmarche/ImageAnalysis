@@ -1,36 +1,24 @@
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
-
-import java.awt.image.BufferedImage;
+import org.opencv.imgcodecs.Imgcodecs;
 import java.util.*;
-import javax.imageio.* ;
-import java.io.*;
 
 public class MeasurableImage {
+
+    static{ System.loadLibrary(Core.NATIVE_LIBRARY_NAME); }
 
     private Mat mat;
     private Size size;
 
-    public MeasurableImage( Mat mat ) {
-        this.mat = mat ;
-        size = mat.size() ;
-        System.out.print( getAvgColor() ) ;
+    public MeasurableImage() {
+        mat = Imgcodecs.imread("src/test.png" ) ;
+        size  = mat.size() ;
+        System.out.println( getHue( getModeHue() ) ) ;
     }
 
-    public static void main ( String[] args ) throws IOException {
-        System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
-        File file = new File( "src/test.png" ) ;
-        BufferedImage img = ImageIO.read( file ) ;
-        int rows = img.getWidth();
-        int cols = img.getHeight();
-        int type = CvType.CV_8U;
-        Mat newMat = new Mat(rows,cols,type);
-        for(int r=0; r<rows; r++){
-            for(int c=0; c<cols; c++){
-                newMat.put(r, c, img.getRGB(r, c));
-            }
-        }
-        new MeasurableImage( newMat ) ;
+    public static void main ( String[] args ) {
+
+        new MeasurableImage() ;
     }
 
     public double[] getAvgColor() {
@@ -49,17 +37,17 @@ public class MeasurableImage {
         return color ;
     }
 
-    public int getMode() {
-        HashMap<Integer, Integer> colorMap = new HashMap<Integer, Integer>();
-        Mat temp = new Mat((int) size.height, (int) size.width, CvType.CV_8U);
-        Imgproc.cvtColor(mat, temp, Imgproc.COLOR_RGB2HSV);
-        for (int i = 0; i < size.height; i++) {
-            for (int j = 0; j < size.width; j++) {
-                int color = getColor(temp, i, j);
-                if (colorMap.keySet().contains(color)) {
-                    colorMap.replace(color, colorMap.get(color) + 1);
+    public int getModeHue() {
+        HashMap<Integer, Integer> colorMap = new HashMap<Integer, Integer>() ;
+        Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
+        Imgproc.cvtColor( mat, temp, Imgproc.COLOR_RGB2HSV ) ;
+        for ( int i = 0; i < size.height; i++ ) {
+            for ( int j = 0; j < size.width; j++ ) {
+                double[] hsv = temp.get( i, j ) ;
+                if ( colorMap.keySet().contains( ( int ) hsv[0] ) ) {
+                    colorMap.replace( ( int ) hsv[0], colorMap.get( ( int ) hsv[0] ) + 1 ) ;
                 } else {
-                    colorMap.put( color, 1) ;
+                    colorMap.put( ( int ) hsv[0], 1 ) ;
                 }
             }
         }
@@ -74,23 +62,26 @@ public class MeasurableImage {
         return  mode ;
     }
 
-    public int getColor( Mat mat, int i, int j ) {
-        int color = 0 ;
-        int shade = 0 ;
-        int saturation = 0 ;
+    public String getHue( int hue ) {
+        String color = "" ;
+        System.out.println( hue ) ;
+        switch ( ( ( int ) ( hue + 15 * 2 ) / 30 ) * 30 ) {
+            case 0: color = "red" ; break ;
+            case 30: color = "orange" ; break ;
+            case 60: color = "yellow" ; break ;
+            case 90: color = "green-yellow" ; break ;
+            case 120: color = "green" ; break ;
+            case 150: color = "cyan-green" ; break ;
+            case 180: color = "cyan" ; break ;
+            case 210: color = "blue-cyan" ; break ;
+            case 240: color = "blue" ; break ;
+            case 270: color = "magenta-blue" ; break ;
+            case 300: color = "magenta" ; break ;
+            case 330: color = "red-magenta" ; break ;
+            default: color = "red" ; break ;
 
-        double[] data = mat.get( i, j ) ;
-        double hue = data[0] ;
-        double sat = data[1] ;
-        double val = data[2] ;
-
-        color =( int )( hue + 15 / 30 )  ;
-        if ( color > 6 ) {
-            color = 0 ;
         }
-        shade = ( int ) ( val / 5 ) ;
-        saturation = ( int ) ( sat / 5 ) ;
-
-        return color << 16 + shade << 8 + saturation ;
+        System.out.println( ( ( int ) ( hue + 15 * 2 ) / 30 ) * 30  ) ;
+        return color ;
     }
 }
