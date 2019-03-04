@@ -1,7 +1,8 @@
-import org.opencv.core.*;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.imgcodecs.Imgcodecs;
-import java.util.*;
+import org.opencv.core.* ;
+import org.opencv.highgui.HighGui ;
+import org.opencv.imgproc.Imgproc ;
+import org.opencv.imgcodecs.Imgcodecs ;
+import java.util.* ;
 
 public class MeasurableImage {
 
@@ -12,17 +13,21 @@ public class MeasurableImage {
 
     public MeasurableImage() {
         mat = Imgcodecs.imread("src/test.png" ) ;
+        if( mat.empty() ) {
+            System.out.println( "Error opening image!" ) ;
+            System.exit( -1 ) ;
+        }
         size  = mat.size() ;
-        System.out.println( getAvgHue() ) ;
+        detectLines();
     }
 
     public static void main ( String[] args ) {
-
         new MeasurableImage() ;
     }
 
     public double[] getAvgRGBColor() {
         double[] color = {0,0,0} ;
+
         for ( int i = 0 ; i < size.height ; i++ ) {
             for ( int j = 0 ; j < size.width ; j++ ) {
                 double[] data = mat.get( i, j ) ;
@@ -31,9 +36,11 @@ public class MeasurableImage {
                 color[2] += data[2] ;
             }
         }
+
         color[0] /= ( size.width * size.height ) ;
         color[1] /= ( size.width * size.height ) ;
         color[2] /= ( size.width * size.height ) ;
+
         return color ;
     }
 
@@ -52,13 +59,16 @@ public class MeasurableImage {
     private double getAvgHSV( int location  ) {
         Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
         Imgproc.cvtColor( mat, temp, Imgproc.COLOR_RGB2HSV ) ;
+
         double sum = 0 ;
+
         for ( int i = 0 ; i < size.height ; i++ ) {
             for ( int j = 0 ; j < size.width ; j++ ) {
                 double[] data = temp.get( i, j ) ;
                 sum += data[location] ;
             }
         }
+
         return sum / ( size.height * size.width ) ;
     }
 
@@ -78,6 +88,7 @@ public class MeasurableImage {
         HashMap<Double, Integer> colorMap = new HashMap<Double, Integer>() ;
         Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
         Imgproc.cvtColor( mat, temp, Imgproc.COLOR_RGB2HSV ) ;
+
         for ( int i = 0; i < size.height; i++ ) {
             for ( int j = 0; j < size.width; j++ ) {
                 double[] hsv = temp.get( i, j ) ;
@@ -88,14 +99,17 @@ public class MeasurableImage {
                 }
             }
         }
+
         double mode = -1 ;
         int max = -1 ;
+
         for( double k : colorMap.keySet() ) {
             if( colorMap.get( k ) > max ) {
                 mode = k ;
                 max = colorMap.get( k ) ;
             }
         }
+
         return  mode ;
     }
 
@@ -114,13 +128,48 @@ public class MeasurableImage {
     private double stdDevHSV( int location ) {
         Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
         Imgproc.cvtColor( mat, temp, Imgproc.COLOR_RGB2HSV ) ;
+
         double sum = 0 ;
         double avg = getModeHSV( location ) ;
+
         for ( int i = 0; i < size.height; i++ ) {
             for ( int j = 0; j < size.width; j++ ) {
                sum += Math.pow( avg - temp.get( i, j )[location], 2 ) ;
             }
         }
+
         return Math.sqrt( sum / ( size.height * size.width ) ) ;
+    }
+
+    public void detectLines() {
+        Mat dst = new Mat(), cdst = new Mat(), cdstP ;
+
+        Imgproc.Canny( mat, dst, 50, 200, 3, false ) ;
+        Imgproc.cvtColor( dst, cdst, Imgproc.COLOR_GRAY2BGR ) ;
+        cdstP = cdst.clone() ;
+
+        Mat lines = new Mat() ;
+        Imgproc.HoughLines( dst, lines, 1, Math.PI / 180, 150 ) ;
+        for ( int x = 0; x < lines.rows() ; x++ ) {
+            double rho = lines.get( x, 0 )[0],
+                    theta = lines.get( x, 0 )[1] ;
+            double a = Math.cos( theta ), b = Math.sin( theta ) ;
+            double x0 = a*rho, y0 = b*rho;
+            Point pt1 = new Point( Math.round( x0 + 1000*( -b ) ), Math.round( y0 + 1000 * ( a ) ) ) ;
+            Point pt2 = new Point( Math.round( x0 - 1000*( - b ) ), Math.round( y0 - 1000 * ( a ) ) ) ;
+            Imgproc.line( cdst, pt1, pt2, new Scalar( 0, 0, 255 ), 3, Imgproc.LINE_AA, 0 ) ;
+        }
+
+        Mat linesP = new Mat() ;
+        Imgproc.HoughLinesP( dst, linesP, 1, Math.PI / 180, 50, 50, 10 ) ;
+        for ( int z = 0; z < linesP.rows() ; z++ ) {
+            double[] l = linesP.get( z, 0 ) ;
+            Imgproc.line( cdstP, new Point( l[0], l[1] ), new Point( l[2], l[3] ), new Scalar( 0, 0, 255 ), 3, Imgproc.LINE_AA, 0 ) ;
+        }
+
+        HighGui.imshow("Source Image", mat) ;
+        HighGui.imshow("Detected Lines (in red) - Standard Hough Line Transform", cdst) ;
+        HighGui.imshow("Detected Lines (in red) - Probabilistic Line Transform", cdstP) ;
+        HighGui.waitKey() ;
     }
 }
