@@ -10,6 +10,14 @@ public class MeasurableImage {
 
     private Mat mat ;
     private Size size ;
+    private static final double[] HSVTHRESH = {25,25,255,2.5,17.5,32.5,47.5,62.5,77.5,92.5,107.5,122.5,137.5,152.5,167.5} ;
+    private static final int HUE = 0 ;
+    private static final int SAT = 1 ;
+    private static final int VAL = 2 ;
+    private static final int BLUE = 0 ;
+    private static final int GREEN = 1 ;
+    private static final int RED = 2 ;
+
 
     public MeasurableImage() {
         mat = Imgcodecs.imread("src/test.png" ) ;
@@ -18,6 +26,8 @@ public class MeasurableImage {
             System.exit( -1 ) ;
         }
         size  = mat.size() ;
+        double [] bgr = getAvgBGRColor() ;
+        System.out.println( bgr[0] + " " + bgr[1] + " " + bgr[2] ) ;
         //add methods to test here -R
     }
 
@@ -31,34 +41,28 @@ public class MeasurableImage {
         for ( int i = 0 ; i < size.height ; i++ ) {
             for ( int j = 0 ; j < size.width ; j++ ) {
                 double[] data = mat.get( i, j ) ;
-                color[0] += data[0] ;
-                color[1] += data[1] ;
-                color[2] += data[2] ;
+                color[BLUE] += data[BLUE] ;
+                color[GREEN] += data[GREEN] ;
+                color[RED] += data[RED] ;
             }
         }
 
-        color[0] /= ( size.width * size.height ) ;
-        color[1] /= ( size.width * size.height ) ;
-        color[2] /= ( size.width * size.height ) ;
+        color[BLUE] /= ( size.width * size.height ) ;
+        color[GREEN] /= ( size.width * size.height ) ;
+        color[RED] /= ( size.width * size.height ) ;
 
         return color ;
     }
 
-    public double getAvgHue() {
-        return getAvgHSV( 0 ) ;
-    }
+    public double getAvgHue() { return getAvgHSV( HUE ) ; }
 
-    public double getAvgSat() {
-        return getAvgHSV( 1 ) ;
-    }
+    public double getAvgSat() { return getAvgHSV( SAT ) ; }
 
-    public double getAvgVal() {
-        return getAvgHSV( 2 ) ;
-    }
+    public double getAvgVal() { return getAvgHSV( VAL ) ; }
 
     private double getAvgHSV( int location  ) {
         Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
-        Imgproc.cvtColor( mat, temp, Imgproc.COLOR_RGB2HSV ) ;
+        Imgproc.cvtColor( mat, temp, Imgproc.COLOR_BGR2HSV ) ;
 
         double sum = 0 ;
 
@@ -72,21 +76,28 @@ public class MeasurableImage {
         return sum / ( size.height * size.width ) ;
     }
 
-    public String getColor( double hue ) {
-        if( hue <= 10 ) { return "Red" ; }
-        if( hue <= 40 ) { return "Yellow" ; }
-        if( hue <= 70 ) { return "Green" ; }
-        if( hue <= 100 ) { return "Cyan" ; }
-        if( hue <= 130 ) { return "Blue" ; }
-        if( hue <= 160 ) { return "Magenta" ; }
+    public String getColor( double[] hsv ) {
+        if( hsv[SAT] < HSVTHRESH[HUE] ) { if( hsv[VAL] < HSVTHRESH[1] ) { return "Black" ; }  if( hsv[VAL] > HSVTHRESH[2] ) { return "White" ; } return "Grey" ; }
+        if( hsv[HUE] <= HSVTHRESH[3] ) { return "Red" ; }
+        if( hsv[HUE] <= HSVTHRESH[4] ) { return "Yellow-Red" ; }
+        if( hsv[HUE] <= HSVTHRESH[5] ) { return "Yellow" ; }
+        if( hsv[HUE] <= HSVTHRESH[6] ) { return "Green-Yellow" ; }
+        if( hsv[HUE] <= HSVTHRESH[7] ) { return "Green" ; }
+        if( hsv[HUE] <= HSVTHRESH[8] ) { return "Cyan-Green" ; }
+        if( hsv[HUE] <= HSVTHRESH[9] ) { return "Cyan" ; }
+        if( hsv[HUE] <= HSVTHRESH[10] ) { return "Blue-Cyan" ; }
+        if( hsv[HUE] <= HSVTHRESH[11] ) { return "Blue" ; }
+        if( hsv[HUE] <= HSVTHRESH[12] ) { return "Magenta-Blue" ; }
+        if( hsv[HUE] <= HSVTHRESH[13] ) { return "Magenta" ; }
+        if( hsv[HUE] <= HSVTHRESH[14] ) { return "Red-Magenta" ; }
         return "Red" ;
     }
 
-    public double getModeHue() { return getModeHSV( 0 ) ; }
+    public double getModeHue() { return getModeHSV( HUE ) ; }
 
-    public double getModeSat() { return getModeHSV( 1 ) ; }
+    public double getModeSat() { return getModeHSV( SAT ) ; }
 
-    public double getModeVal() { return getModeHSV( 2 ) ; }
+    public double getModeVal() { return getModeHSV( VAL ) ; }
 
     private double getModeHSV( int location ) {
         HashMap<Double, Integer> colorMap = new HashMap<Double, Integer>() ;
@@ -117,11 +128,11 @@ public class MeasurableImage {
         return  mode ;
     }
 
-    public double stdDevHue() { return stdDevHSV( 0 ) ; }
+    public double stdDevHue() { return stdDevHSV( HUE ) ; }
 
-    public double stdDevSat() { return stdDevHSV( 1 ) ; }
+    public double stdDevSat() { return stdDevHSV( SAT ) ; }
 
-    public double stdDevVal() { return stdDevHSV( 2 ) ; }
+    public double stdDevVal() { return stdDevHSV( VAL ) ; }
 
     private double stdDevHSV( int location ) {
         Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
@@ -140,7 +151,17 @@ public class MeasurableImage {
     }
 
     public double stdDevBGR() {
-        return 0 ; //Temp method, progress will be made later -R
+        double [] avg = getAvgBGRColor() ;
+        double sum = 0 ;
+
+        for ( int i = 0; i < size.height; i++ ) {
+            for ( int j = 0; j < size.width; j++ ) {
+                double [] bgr = mat.get( i, j ) ;
+                sum += Math.pow( bgr[BLUE] - avg[BLUE], 2 ) + Math.pow( bgr[GREEN] - avg[GREEN], 2 ) + Math.pow( bgr[RED] - avg[RED], 2 ) ;
+            }
+        }
+
+        return Math.sqrt( sum / ( size.height * size.width ) ) ;
     }
 
     public void detectLines() {
