@@ -20,15 +20,18 @@ public class MeasurableImage {
 
 
     public MeasurableImage() {
-        mat = Imgcodecs.imread("src/test.png" ) ;
+        mat = Imgcodecs.imread("src/flower.jpg" ) ;
         if( mat.empty() ) {
             System.out.println( "Error opening image!" ) ;
             System.exit( -1 ) ;
         }
         size  = mat.size() ;
-        double [] bgr = getAvgBGRColor() ;
-        System.out.println( bgr[0] + " " + bgr[1] + " " + bgr[2] ) ;
-        //add methods to test here -R
+        Mat dst = new Mat() ;
+        Imgproc.Canny( mat, dst, 220, 255, 3, false ) ;
+        Imgproc.threshold( dst, dst, 100, 255, Imgproc.THRESH_BINARY_INV ) ;
+        Imgproc.distanceTransform( dst, dst, Imgproc.CV_DIST_C, 3 ) ;
+        dst.convertTo(dst, CvType.CV_8UC1 ) ;
+        Imgcodecs.imwrite( "src/dst.png", dst ) ;
     }
 
     public static void main ( String[] args ) {
@@ -200,5 +203,5 @@ public class MeasurableImage {
     }
 }
 
-//https://docs.opencv.org/3.4/db/df6/tutorial_erosion_dilatation.html <= skeletonization
+//https://docs.opencv.org/3.4/db/df6/tutorial_erosion_dilatation.html http://paper.ijcsns.org/07_book/200707/20070729.pdf http://www-prima.inrialpes.fr/perso/Tran/Draft/gateway.cfm.pdf <= skeletonization
 //https://docs.opencv.org/3.4/d9/db0/tutorial_hough_lines.html <= hough line transform
