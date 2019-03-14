@@ -10,13 +10,17 @@ public class MeasurableImage {
 
     private Mat mat ;
     private Size size ;
-    private static final double[] HSVTHRESH = {25,25,255,2.5,17.5,32.5,47.5,62.5,77.5,92.5,107.5,122.5,137.5,152.5,167.5} ;
-    private static final int HUE = 0 ;
-    private static final int SAT = 1 ;
-    private static final int VAL = 2 ;
-    private static final int BLUE = 0 ;
-    private static final int GREEN = 1 ;
-    private static final int RED = 2 ;
+
+    private static final double[] HSVTHRESH = {25,   25,   225,   2.5,  17.5,   32.5,   47.5,   62.5,   77.5,   92.5,   107.5,   122.5,   137.5,   152.5,   167.5} ;
+                       //HSV Threshold values: grey  black white  red   redyel  yellow  yelgre  green   cyagre  cyan    blucya   blue     magblu   magenta  redmag
+
+    private static final int HUE = 0 ; //Location of hue value in HSV double[]
+    private static final int SAT = 1 ; //Location of saturation value in HSV double[]
+    private static final int VAL = 2 ; //Location of value (lightness) value in HSV double[]
+
+    private static final int BLUE = 0 ; //Location of blue value in BGR double[]
+    private static final int GREEN = 1 ; //Location of green value in BGR double[]
+    private static final int RED = 2 ; //Location of red value in BGR double[]
 
 
     public MeasurableImage() {
@@ -26,21 +30,14 @@ public class MeasurableImage {
             System.exit( -1 ) ;
         }
         size  = mat.size() ;
-        Mat dst = new Mat() ;
-        Imgproc.Canny( mat, dst, 220, 255, 3, false ) ;
-        Imgproc.threshold( dst, dst, 100, 255, Imgproc.THRESH_BINARY_INV ) ;
-        Imgproc.distanceTransform( dst, dst, Imgproc.CV_DIST_C, 3 ) ;
-        dst.convertTo(dst, CvType.CV_8UC1 ) ;
-        Imgcodecs.imwrite( "src/dst.png", dst ) ;
     }
 
     public static void main ( String[] args ) {
         new MeasurableImage() ;
     }
 
-    public double[] getAvgBGRColor() {
+    public double[] getAvgBGRColor() { //Returns double[] of average blue, green, and red values of BGR image
         double[] color = {0,0,0} ;
-
         for ( int i = 0 ; i < size.height ; i++ ) {
             for ( int j = 0 ; j < size.width ; j++ ) {
                 double[] data = mat.get( i, j ) ;
@@ -49,37 +46,32 @@ public class MeasurableImage {
                 color[RED] += data[RED] ;
             }
         }
-
         color[BLUE] /= ( size.width * size.height ) ;
         color[GREEN] /= ( size.width * size.height ) ;
         color[RED] /= ( size.width * size.height ) ;
-
         return color ;
     }
 
-    public double getAvgHue() { return getAvgHSV( HUE ) ; }
+    public double getAvgHue() { return getAvgHSV( HUE ) ; } //Uses getAvgHSV to return average hue value
 
-    public double getAvgSat() { return getAvgHSV( SAT ) ; }
+    public double getAvgSat() { return getAvgHSV( SAT ) ; } //Uses getAvgHSV to return average saturation value
 
-    public double getAvgVal() { return getAvgHSV( VAL ) ; }
+    public double getAvgVal() { return getAvgHSV( VAL ) ; } //Uses getAvgHSV to return average lightness value
 
-    private double getAvgHSV( int location  ) {
+    private double getAvgHSV( int location  ) { //Returns average value of specified location in HSV double[]
         Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
         Imgproc.cvtColor( mat, temp, Imgproc.COLOR_BGR2HSV ) ;
-
         double sum = 0 ;
-
         for ( int i = 0 ; i < size.height ; i++ ) {
             for ( int j = 0 ; j < size.width ; j++ ) {
                 double[] data = temp.get( i, j ) ;
                 sum += data[location] ;
             }
         }
-
         return sum / ( size.height * size.width ) ;
     }
 
-    public String getColor( double[] hsv ) {
+    public String getColor( double[] hsv ) { //Returns color based on HSVTHRESH double[]
         if( hsv[SAT] < HSVTHRESH[HUE] ) { if( hsv[VAL] < HSVTHRESH[1] ) { return "Black" ; }  if( hsv[VAL] > HSVTHRESH[2] ) { return "White" ; } return "Grey" ; }
         if( hsv[HUE] <= HSVTHRESH[3] ) { return "Red" ; }
         if( hsv[HUE] <= HSVTHRESH[4] ) { return "Yellow-Red" ; }
@@ -96,17 +88,16 @@ public class MeasurableImage {
         return "Red" ;
     }
 
-    public double getModeHue() { return getModeHSV( HUE ) ; }
+    public double getModeHue() { return getModeHSV( HUE ) ; } //Uses getModeHSV to return most common hue value
 
-    public double getModeSat() { return getModeHSV( SAT ) ; }
+    public double getModeSat() { return getModeHSV( SAT ) ; } //Uses getModeHSV to return most common saturation value
 
-    public double getModeVal() { return getModeHSV( VAL ) ; }
+    public double getModeVal() { return getModeHSV( VAL ) ; } //Uses getModeHSV to return most common lightness value
 
-    private double getModeHSV( int location ) {
+    private double getModeHSV( int location ) { //Returns most common value of specified location in HSV double[]
         HashMap<Double, Integer> colorMap = new HashMap<Double, Integer>() ;
         Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
         Imgproc.cvtColor( mat, temp, Imgproc.COLOR_BGR2HSV ) ;
-
         for ( int i = 0; i < size.height; i++ ) {
             for ( int j = 0; j < size.width; j++ ) {
                 double[] hsv = temp.get( i, j ) ;
@@ -117,43 +108,18 @@ public class MeasurableImage {
                 }
             }
         }
-
         double mode = -1 ;
         int max = -1 ;
-
         for( double k : colorMap.keySet() ) {
             if( colorMap.get( k ) > max ) {
                 mode = k ;
                 max = colorMap.get( k ) ;
             }
         }
-
         return  mode ;
     }
 
-    public double stdDevHue() { return stdDevHSV( HUE ) ; }
-
-    public double stdDevSat() { return stdDevHSV( SAT ) ; }
-
-    public double stdDevVal() { return stdDevHSV( VAL ) ; }
-
-    private double stdDevHSV( int location ) {
-        Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
-        Imgproc.cvtColor( mat, temp, Imgproc.COLOR_RGB2HSV ) ;
-
-        double sum = 0 ;
-        double avg = getModeHSV( location ) ;
-
-        for ( int i = 0; i < size.height; i++ ) {
-            for ( int j = 0; j < size.width; j++ ) {
-               sum += Math.pow( avg - temp.get( i, j )[location], 2 ) ;
-            }
-        }
-
-        return Math.sqrt( sum / ( size.height * size.width ) ) ;
-    }
-
-    public double stdDevBGR() {
+    public double stdDevBGR() { //returns double[] indicating standard deviation of BGR values
         double [] avg = getAvgBGRColor() ;
         double sum = 0 ;
 
@@ -163,17 +129,32 @@ public class MeasurableImage {
                 sum += Math.pow( bgr[BLUE] - avg[BLUE], 2 ) + Math.pow( bgr[GREEN] - avg[GREEN], 2 ) + Math.pow( bgr[RED] - avg[RED], 2 ) ;
             }
         }
-
         return Math.sqrt( sum / ( size.height * size.width ) ) ;
     }
 
-    public void detectLines() {
+    public double stdDevHue() { return stdDevHSV( HUE ) ; } //Uses stdDevHSV to return standard deviation of hue value
+
+    public double stdDevSat() { return stdDevHSV( SAT ) ; } //Uses stdDevHSV to return standard deviation of saturation value
+
+    public double stdDevVal() { return stdDevHSV( VAL ) ; } //Uses stdDevHSV to return standard deviation of lightness value
+
+    private double stdDevHSV( int location ) { //Returns returns standard deviation of value of specified location in HSV double[]
+        Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
+        Imgproc.cvtColor( mat, temp, Imgproc.COLOR_RGB2HSV ) ;
+        double sum = 0 ;
+        double avg = getModeHSV( location ) ;
+        for ( int i = 0; i < size.height; i++ ) {
+            for ( int j = 0; j < size.width; j++ ) {
+               sum += Math.pow( avg - temp.get( i, j )[location], 2 ) ;
+            }
+        }
+        return Math.sqrt( sum / ( size.height * size.width ) ) ;
+    }
+
+    public Mat detectLines() { //I found this online, I don't fully understand it. Please be careful
         Mat dst = new Mat(), /*cdst = new Mat(),*/ cdstP = new Mat() ;
-
         Imgproc.Canny( mat, dst, 50, 200, 3, false ) ;
-
-        Imgproc.cvtColor( dst, cdstP, Imgproc.COLOR_GRAY2BGR ) ; //Set to only display probability transform. Uncomment all other lines of code and comment this line to display both types of transform. -R
-
+        Imgproc.cvtColor( dst, cdstP, Imgproc.COLOR_GRAY2BGR ) ;
         /*Imgproc.cvtColor( dst, cdst, Imgproc.COLOR_GRAY2BGR ) ;
         cdstP = cdst.clone() ;
 
@@ -188,20 +169,41 @@ public class MeasurableImage {
             Point pt2 = new Point( Math.round( x0 - 1000*( - b ) ), Math.round( y0 - 1000 * ( a ) ) ) ;
             Imgproc.line( cdst, pt1, pt2, new Scalar( 0, 0, 255 ), 3, Imgproc.LINE_AA, 0 ) ;
         }*/
-
         Mat linesP = new Mat() ;
         Imgproc.HoughLinesP( dst, linesP, 1, Math.PI / 180, 50, 10, 10 ) ;
         for ( int z = 0; z < linesP.rows() ; z++ ) {
             double[] l = linesP.get( z, 0 ) ;
             Imgproc.line( cdstP, new Point( l[0], l[1] ), new Point( l[2], l[3] ), new Scalar( 0, 0, 255 ), 3, Imgproc.LINE_AA, 0 ) ;
         }
-
-        HighGui.imshow("Source Image", mat) ;
+        //HighGui.imshow("Source Image", mat) ;
         //HighGui.imshow("Detected Lines (in red) - Standard Hough Line Transform", cdst) ;
-        HighGui.imshow("Detected Lines (in red) - Probabilistic Line Transform", cdstP) ;
-        HighGui.waitKey() ;
+        //HighGui.imshow("Detected Lines (in red) - Probabilistic Line Transform", cdstP) ;
+        //HighGui.waitKey() ;
+        return cdstP ;
+    }
+
+    public Mat skeletonize() { //Maybe finish one day, does not work
+        Mat dst = new Mat() ;
+        Imgproc.Canny( mat, dst, 220, 255, 3, false ) ;
+        Imgproc.threshold( dst, dst, 100, 255, Imgproc.THRESH_BINARY_INV ) ;
+        Imgproc.distanceTransform( dst, dst, Imgproc.CV_DIST_C, 3 ) ;
+        Size dstSize = dst.size() ;
+        int amtCleared = -1 ;
+        while ( amtCleared != 0 ) {
+            for ( int i = 0; i < dstSize.height; i++ ) {
+                for ( int j = 0; j < dstSize.width; j++ ) {
+                    //find neighborsx
+                    //run iterations to find pixels to delete
+                    //find a way to append delete/save info to pixels
+                    //sweep through, delete pixels, run again
+                }
+            }
+        }
+        Imgcodecs.imwrite( "src/dst.png", dst ) ;
+        return dst;
     }
 }
+// https://docs.opencv.org/3.4/javadoc/org/opencv/core/Mat.html <= MAT Java Documentation
 
-//https://docs.opencv.org/3.4/db/df6/tutorial_erosion_dilatation.html http://paper.ijcsns.org/07_book/200707/20070729.pdf http://www-prima.inrialpes.fr/perso/Tran/Draft/gateway.cfm.pdf <= skeletonization
-//https://docs.opencv.org/3.4/d9/db0/tutorial_hough_lines.html <= hough line transform
+// http://www-prima.inrialpes.fr/perso/Tran/Draft/gateway.cfm.pdf <= Zhang-Suen Skeleton Algorithm
+// http://paper.ijcsns.org/07_book/200707/20070729.pdf <= Chang Skeleton Algorithm
