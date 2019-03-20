@@ -2,6 +2,8 @@ import org.opencv.core.* ;
 import org.opencv.highgui.HighGui ;
 import org.opencv.imgproc.Imgproc ;
 import org.opencv.imgcodecs.Imgcodecs ;
+
+import java.nio.file.FileSystemNotFoundException;
 import java.util.* ;
 
 public class MeasurableImage {
@@ -30,6 +32,7 @@ public class MeasurableImage {
             System.exit( -1 ) ;
         }
         size  = mat.size() ;
+        skeletonize() ;
     }
 
     public static void main ( String[] args ) {
@@ -182,28 +185,84 @@ public class MeasurableImage {
         return cdstP ;
     }
 
-    public Mat skeletonize() { //Maybe finish one day, does not work
+    public Mat skeletonize() { //Maybe finish one day, does not work (Uses Zhang-Suen Thinning Algorithm)
         Mat dst = new Mat() ;
         Imgproc.Canny( mat, dst, 220, 255, 3, false ) ;
         Imgproc.threshold( dst, dst, 100, 255, Imgproc.THRESH_BINARY_INV ) ;
-        Imgproc.distanceTransform( dst, dst, Imgproc.CV_DIST_C, 3 ) ;
         Size dstSize = dst.size() ;
-        int amtCleared = -1 ;
-        while ( amtCleared != 0 ) {
-            for ( int i = 0; i < dstSize.height; i++ ) {
-                for ( int j = 0; j < dstSize.width; j++ ) {
-                    //find neighborsx
-                    //run iterations to find pixels to delete
-                    //find a way to append delete/save info to pixels
-                    //sweep through, delete pixels, run again
+        for ( int i = 0; i < dstSize.height; i++ ) {
+            for ( int j = 0; j < dstSize.width; j++ ) {
+                double[] entry = {1.0} ;
+                if( dst.get( i, j )[0] != 0 ) {
+                    dst.put( i, j, entry ) ;
                 }
             }
         }
+        int amtCleared = 1 ;
+        while ( amtCleared > 0 ) {
+            amtCleared = 0 ;
+            boolean[][] locations = new boolean[(int)dstSize.height][(int)dstSize.width] ;
+            for ( int i = 1; i < dstSize.height - 1 ; i++ ) {
+                for ( int j = 1; j < dstSize.width - 1 ; j++ ) {
+                    double[] neighbors = new double[8] ;
+                    neighbors[0] = dst.get( i - 1, j )[0] ;
+                    neighbors[1] = dst.get( i - 1, j + 1 )[0] ;
+                    neighbors[2] = dst.get( i, j + 1 )[0] ;
+                    neighbors[3] = dst.get( i + 1, j + 1 )[0] ;
+                    neighbors[4] = dst.get( i + 1, j )[0] ;
+                    neighbors[5] = dst.get( i + 1, j - 1 )[0] ;
+                    neighbors[6] = dst.get( i, j - 1 )[0] ;
+                    neighbors[7] = dst.get( i - 1, j - 1 )[0] ;
+                    if( caseA( neighbors ) || caseB( neighbors ) ) {
+                        System.out.println("tic") ;
+                        locations[i][j] = true ;
+                    }
+                }
+            }
+            for ( int i = 0; i < dstSize.height; i++ ) {
+                for ( int j = 0; j < dstSize.width; j++ ) {
+                    if( locations[i][j] ) {
+                        double[] entry = { 0.0 } ;
+                        dst.put( i, j, entry ) ;
+                        amtCleared++ ;
+                    }
+                }
+            }
+            System.out.println( amtCleared + "" );
+        }
         Imgcodecs.imwrite( "src/dst.png", dst ) ;
+        System.out.println("Done");
         return dst;
     }
-}
-// https://docs.opencv.org/3.4/javadoc/org/opencv/core/Mat.html <= MAT Java Documentation
 
-// http://www-prima.inrialpes.fr/perso/Tran/Draft/gateway.cfm.pdf <= Zhang-Suen Skeleton Algorithm
-// http://paper.ijcsns.org/07_book/200707/20070729.pdf <= Chang Skeleton Algorithm
+    public boolean caseA( double[] neighbors ) {
+        return countAP( neighbors ) == 1 &&
+                sumNeighbors( neighbors ) >= 2 &&
+                sumNeighbors( neighbors ) <= 6 &&
+                neighbors[0] * neighbors[2] * neighbors[4] == 0 &&
+                neighbors[2] * neighbors[4] * neighbors[6] == 0 ;
+    }
+
+    public boolean caseB( double[] neighbors ) {
+        return countAP( neighbors ) == 1 &&
+                sumNeighbors( neighbors ) >= 2 &&
+                sumNeighbors( neighbors ) <= 6 &&
+                neighbors[0] * neighbors[2] * neighbors[6] == 0 &&
+                neighbors[0] * neighbors[4] * neighbors[6] == 0 ;
+    }
+
+    public int countAP( double[] neighbors ) { //returns the numbver of 01 patterns found in double[]
+        int sum = 0 ;
+        int prev = -1 ;
+        for( double i : neighbors ) {
+            if( (int)prev == 0 && (int)i == 1 ) {
+                sum++ ;
+            }
+        }
+        return sum ;
+    }
+
+    public double sumNeighbors( double[] neighbors ) {
+        return neighbors[0] + neighbors[1] + neighbors[2] + neighbors[3] + neighbors[4] + neighbors[5] + neighbors[6] + neighbors[7]  ;
+    }
+}
