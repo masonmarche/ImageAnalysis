@@ -1,9 +1,6 @@
 import org.opencv.core.* ;
-import org.opencv.highgui.HighGui ;
 import org.opencv.imgproc.Imgproc ;
 import org.opencv.imgcodecs.Imgcodecs ;
-
-import java.nio.file.FileSystemNotFoundException;
 import java.util.* ;
 
 public class MeasurableImage {
@@ -26,13 +23,13 @@ public class MeasurableImage {
 
 
     public MeasurableImage() {
-        mat = Imgcodecs.imread("src/flower.jpg" ) ;
-        if( mat.empty() ) {
+        mat = Imgcodecs.imread("src/veins.jpg" ) ;
+        if ( mat.empty() ) {
             System.out.println( "Error opening image!" ) ;
             System.exit( -1 ) ;
         }
         size  = mat.size() ;
-        skeletonize() ;
+        Imgcodecs.imwrite( "src/dst.png", skeletonize() ) ;
     }
 
     public static void main ( String[] args ) {
@@ -113,8 +110,8 @@ public class MeasurableImage {
         }
         double mode = -1 ;
         int max = -1 ;
-        for( double k : colorMap.keySet() ) {
-            if( colorMap.get( k ) > max ) {
+        for ( double k : colorMap.keySet() ) {
+            if ( colorMap.get( k ) > max ) {
                 mode = k ;
                 max = colorMap.get( k ) ;
             }
@@ -185,15 +182,54 @@ public class MeasurableImage {
         return cdstP ;
     }
 
-    public Mat skeletonize() { //Maybe finish one day, does not work (Uses Zhang-Suen Thinning Algorithm)
+    public HashMap<String, Double> colorOccur() {
+        HashMap<String, Double> colors = new HashMap<String, Double>() ;
+        Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
+        Imgproc.cvtColor( mat, temp, Imgproc.COLOR_BGR2HSV ) ;
+        double sum = 0 ;
+        for ( int i = 0 ; i < size.height ; i++ ) {
+            for ( int j = 0 ; j < size.width ; j++ ) {
+                String color = getColor( temp.get( i, j ) ) ;
+                if ( colors.putIfAbsent( color, 1.0 ) != null ) {
+                    colors.replace( color, colors.get( color ) + 1 ) ;
+                }
+            }
+        }
+        return colors ;
+    }
+
+    public HashMap<String, Double> colorOccurPercent() {
+        HashMap<String, Double> colors ;
+        colors = colorOccur() ;
+        for ( String color : colors.keySet() ) {
+            colors.replace( color, colors.get( color ) / ( size.height * size.width ) ) ;
+        }
+        return colors ;
+    }
+
+    /*public Mat mapIntensity( int location ) {
+        Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
+        Imgproc.cvtColor( mat, temp, Imgproc.COLOR_RGB2HSV ) ;
+        for( int i = 0 ; i < size.height ; i++ ) {
+            for( int j = 0 ; j < size.width ; j++ ) {
+                double[] data = {0, 100, 0 } ;
+                data[2] =  temp.get( i, j )[location] ;
+                temp.put( i, j, data ) ;
+            }
+        }
+        return temp ;
+    }*/
+
+    public Mat skeletonize() { //Only works on black and white images (could be adjusted to count shades of fray as black or white) (Uses Zhang-Suen Thinning Algorithm)
+        //I know the cod is a mess, but it works
         Mat dst = new Mat() ;
-        Imgproc.Canny( mat, dst, 220, 255, 3, false ) ;
-        Imgproc.threshold( dst, dst, 100, 255, Imgproc.THRESH_BINARY_INV ) ;
+        Imgproc.cvtColor( mat, dst, Imgproc.COLOR_BGR2GRAY ) ;
+        Imgproc.threshold( dst, dst, 100, 255, Imgproc.THRESH_BINARY ) ;
         Size dstSize = dst.size() ;
         for ( int i = 0; i < dstSize.height; i++ ) {
             for ( int j = 0; j < dstSize.width; j++ ) {
-                double[] entry = {1.0} ;
-                if( dst.get( i, j )[0] != 0 ) {
+                if ( dst.get( i, j )[0] == 255.0 ) {
+                    double[] entry = { 1.0 } ;
                     dst.put( i, j, entry ) ;
                 }
             }
@@ -202,67 +238,99 @@ public class MeasurableImage {
         while ( amtCleared > 0 ) {
             amtCleared = 0 ;
             boolean[][] locations = new boolean[(int)dstSize.height][(int)dstSize.width] ;
-            for ( int i = 1; i < dstSize.height - 1 ; i++ ) {
+            for ( int i = 1; i < dstSize.height - 1 ; i++ ) { //iteration A
                 for ( int j = 1; j < dstSize.width - 1 ; j++ ) {
-                    double[] neighbors = new double[8] ;
-                    neighbors[0] = dst.get( i - 1, j )[0] ;
-                    neighbors[1] = dst.get( i - 1, j + 1 )[0] ;
-                    neighbors[2] = dst.get( i, j + 1 )[0] ;
-                    neighbors[3] = dst.get( i + 1, j + 1 )[0] ;
-                    neighbors[4] = dst.get( i + 1, j )[0] ;
-                    neighbors[5] = dst.get( i + 1, j - 1 )[0] ;
-                    neighbors[6] = dst.get( i, j - 1 )[0] ;
-                    neighbors[7] = dst.get( i - 1, j - 1 )[0] ;
-                    if( caseA( neighbors ) || caseB( neighbors ) ) {
-                        System.out.println("tic") ;
-                        locations[i][j] = true ;
+                    if ( dst.get( i, j )[0] == 1 ) {
+                        double[] neighbors = new double[8];
+                        neighbors[0] = dst.get(i - 1, j)[0];
+                        neighbors[1] = dst.get(i - 1, j + 1)[0];
+                        neighbors[2] = dst.get(i, j + 1)[0];
+                        neighbors[3] = dst.get(i + 1, j + 1)[0];
+                        neighbors[4] = dst.get(i + 1, j)[0];
+                        neighbors[5] = dst.get(i + 1, j - 1)[0];
+                        neighbors[6] = dst.get(i, j - 1)[0];
+                        neighbors[7] = dst.get(i - 1, j - 1)[0];
+                        if (caseA(neighbors) && sumNeighbors(neighbors) >= 2 && sumNeighbors(neighbors) <= 6 && countAP( neighbors ) == 1 ) {
+                                locations[i][j] = true ;
+                        }
                     }
                 }
             }
             for ( int i = 0; i < dstSize.height; i++ ) {
                 for ( int j = 0; j < dstSize.width; j++ ) {
-                    if( locations[i][j] ) {
+                    if ( locations[i][j] ) {
                         double[] entry = { 0.0 } ;
                         dst.put( i, j, entry ) ;
                         amtCleared++ ;
                     }
                 }
             }
-            System.out.println( amtCleared + "" );
+            for ( int i = 1; i < dstSize.height - 1 ; i++ ) { //iteration B
+                for ( int j = 1; j < dstSize.width - 1 ; j++ ) {
+                    if ( dst.get( i, j )[0] == 1 ) {
+                        double[] neighbors = new double[8];
+                        neighbors[0] = dst.get(i - 1, j)[0];
+                        neighbors[1] = dst.get(i - 1, j + 1)[0];
+                        neighbors[2] = dst.get(i, j + 1)[0];
+                        neighbors[3] = dst.get(i + 1, j + 1)[0];
+                        neighbors[4] = dst.get(i + 1, j)[0];
+                        neighbors[5] = dst.get(i + 1, j - 1)[0];
+                        neighbors[6] = dst.get(i, j - 1)[0];
+                        neighbors[7] = dst.get(i - 1, j - 1)[0];
+                        if (caseB(neighbors) && sumNeighbors(neighbors) >= 2 && sumNeighbors(neighbors) <= 6 && countAP( neighbors ) == 1 ) {
+                            locations[i][j] = true ;
+                        }
+                    }
+                }
+            }
+            for ( int i = 0; i < dstSize.height; i++ ) {
+                for ( int j = 0; j < dstSize.width; j++ ) {
+                    if ( locations[i][j] ) {
+                        double[] entry = { 0.0 } ;
+                        dst.put( i, j, entry ) ;
+                        amtCleared++ ;
+                    }
+                }
+            }
+            System.out.println( amtCleared ) ;
         }
-        Imgcodecs.imwrite( "src/dst.png", dst ) ;
-        System.out.println("Done");
+        for ( int i = 0; i < dstSize.height; i++ ) {
+            for ( int j = 0; j < dstSize.width; j++ ) {
+                if ( dst.get( i, j )[0] == 1.0 ) {
+                    double[] entry = { 255 } ;
+                    dst.put( i, j, entry ) ;
+                }
+            }
+        }
         return dst;
     }
 
     public boolean caseA( double[] neighbors ) {
-        return countAP( neighbors ) == 1 &&
-                sumNeighbors( neighbors ) >= 2 &&
-                sumNeighbors( neighbors ) <= 6 &&
-                neighbors[0] * neighbors[2] * neighbors[4] == 0 &&
+        return neighbors[0] * neighbors[2] * neighbors[4] == 0 &&
                 neighbors[2] * neighbors[4] * neighbors[6] == 0 ;
     }
 
     public boolean caseB( double[] neighbors ) {
-        return countAP( neighbors ) == 1 &&
-                sumNeighbors( neighbors ) >= 2 &&
-                sumNeighbors( neighbors ) <= 6 &&
-                neighbors[0] * neighbors[2] * neighbors[6] == 0 &&
+        return neighbors[0] * neighbors[2] * neighbors[6] == 0 &&
                 neighbors[0] * neighbors[4] * neighbors[6] == 0 ;
     }
 
     public int countAP( double[] neighbors ) { //returns the numbver of 01 patterns found in double[]
         int sum = 0 ;
         int prev = -1 ;
-        for( double i : neighbors ) {
+        for ( double i : neighbors ) {
             if( (int)prev == 0 && (int)i == 1 ) {
                 sum++ ;
             }
+            prev = (int)i ;
+        }
+        if ( neighbors[7] == 0 && neighbors[0] == 1 ) {
+            sum++ ;
         }
         return sum ;
     }
 
-    public double sumNeighbors( double[] neighbors ) {
+    public double sumNeighbors( double[] neighbors ) { //count all "positive" (white) pixels in neighbors
         return neighbors[0] + neighbors[1] + neighbors[2] + neighbors[3] + neighbors[4] + neighbors[5] + neighbors[6] + neighbors[7]  ;
     }
 }

@@ -13,35 +13,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/MeasurableImage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="208" column="44" lean-forward="true" selection-start-line="208" selection-start-column="44" selection-end-line="208" selection-end-column="44" />
+            <state relative-caret-position="391">
+              <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1431#1432#0" expanded="true" />
-                <element signature="e#1469#1470#0" expanded="true" />
-                <element signature="e#4605#4622#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/../ImageLibraries/opencv/opencv/build/java/opencv-401.jar!/org/opencv/core/Mat.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="251">
-              <caret line="1133" selection-start-line="1133" selection-end-line="1133" />
-              <folding>
-                <element signature="e#26194#26195#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Main.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="4" column="32" selection-start-line="4" selection-start-column="32" selection-end-line="4" selection-end-column="32" />
             </state>
           </provider>
         </entry>
@@ -71,7 +47,6 @@
     </navigator>
     <panes>
       <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -79,15 +54,11 @@
               <item name="ImageAnalysisProject" type="b2602c69:ProjectViewProjectNode" />
               <item name="ImageAnalysisProject" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="ImageAnalysisProject" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ImageAnalysisProject" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -139,18 +110,18 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.08901919" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.09221748" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
       <window_info id="UI Designer" order="4" />
       <window_info id="Capture Tool" order="5" />
       <window_info id="Favorites" order="6" side_tool="true" />
-      <window_info anchor="bottom" id="Messages" weight="0.32936078" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.15492958" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.15492958" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -158,6 +129,7 @@
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info anchor="bottom" id="Messages" order="10" weight="0.32827735" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -169,10 +141,14 @@
     </layout>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/out/production/ImageAnalysis/MeasurableImage.class">
+    <entry file="file://$PROJECT_DIR$/out/production/ImageAnalysis/MeasurableImage.class" />
+    <entry file="jar://$PROJECT_DIR$/../ImageLibraries/opencv/opencv/build/java/opencv-401.jar!/org/opencv/core/Mat.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="71" column="44" selection-start-line="71" selection-start-column="44" selection-end-line="71" selection-end-column="44" />
+        <state relative-caret-position="19227">
+          <caret line="1133" selection-start-line="1133" selection-end-line="1133" />
+          <folding>
+            <element signature="e#26194#26195#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -183,25 +159,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/../ImageLibraries/opencv/opencv/build/java/opencv-401.jar!/org/opencv/core/Mat.java">
+    <entry file="file://$PROJECT_DIR$/src/parkinglot.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/out/production/ImageAnalysisProject/Main.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="251">
-          <caret line="1133" selection-start-line="1133" selection-end-line="1133" />
+        <state>
           <folding>
-            <element signature="e#26194#26195#0" expanded="true" />
+            <element signature="e#0#217#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/out/production/ImageAnalysisProject/MeasurableImage.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4708">
+          <folding>
+            <element signature="e#0#11392#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/MeasurableImage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="208" column="44" lean-forward="true" selection-start-line="208" selection-start-column="44" selection-end-line="208" selection-end-column="44" />
+        <state relative-caret-position="391">
+          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1431#1432#0" expanded="true" />
-            <element signature="e#1469#1470#0" expanded="true" />
-            <element signature="e#4605#4622#0" expanded="true" />
           </folding>
         </state>
       </provider>
