@@ -23,7 +23,7 @@ public class MeasurableImage {
 
 
     public MeasurableImage() {
-        mat = Imgcodecs.imread("src/veins.jpg" ) ;
+        mat = Imgcodecs.imread("src/test.png" ) ;
         if ( mat.empty() ) {
             System.out.println( "Error opening image!" ) ;
             System.exit( -1 ) ;
@@ -182,7 +182,7 @@ public class MeasurableImage {
         return cdstP ;
     }
 
-    public HashMap<String, Double> colorOccur() {
+    public HashMap<String, Double> colorOccur() { //returns a HashMap of the count of each color (Maps a String color name to an Double count)
         HashMap<String, Double> colors = new HashMap<String, Double>() ;
         Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
         Imgproc.cvtColor( mat, temp, Imgproc.COLOR_BGR2HSV ) ;
@@ -198,7 +198,7 @@ public class MeasurableImage {
         return colors ;
     }
 
-    public HashMap<String, Double> colorOccurPercent() {
+    public HashMap<String, Double> colorOccurPercent() { //returns a HashMap of the percent of the photo made up of each color (Maps a String color name to an Double percent)
         HashMap<String, Double> colors ;
         colors = colorOccur() ;
         for ( String color : colors.keySet() ) {
@@ -206,19 +206,6 @@ public class MeasurableImage {
         }
         return colors ;
     }
-
-    /*public Mat mapIntensity( int location ) {
-        Mat temp = new Mat( ( int ) size.height, ( int ) size.width, CvType.CV_8UC3 ) ;
-        Imgproc.cvtColor( mat, temp, Imgproc.COLOR_RGB2HSV ) ;
-        for( int i = 0 ; i < size.height ; i++ ) {
-            for( int j = 0 ; j < size.width ; j++ ) {
-                double[] data = {0, 100, 0 } ;
-                data[2] =  temp.get( i, j )[location] ;
-                temp.put( i, j, data ) ;
-            }
-        }
-        return temp ;
-    }*/
 
     public Mat skeletonize() { //Only works on black and white images (could be adjusted to count shades of fray as black or white) (Uses Zhang-Suen Thinning Algorithm)
         //I know the cod is a mess, but it works
@@ -302,7 +289,16 @@ public class MeasurableImage {
                 }
             }
         }
-        return dst;
+        Mat result = mat ;
+        for ( int i = 0; i < dstSize.height; i++ ) {
+            for ( int j = 0; j < dstSize.width; j++ ) {
+                if ( dst.get( i, j )[0] == 255 ) {
+                    double[] entry = { 0, 0, 255 } ;
+                    result.put( i, j, entry ) ;
+                }
+            }
+        }
+        return result;
     }
 
     public boolean caseA( double[] neighbors ) {
